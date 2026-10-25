@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barnaby's Damned Day - Play Online Arcade</title>
+    <style>
+        :root {
+            --bg-color: #0b090a;
+            --container-bg: #161a1d;
+            --primary-neon: #a01a58;
+            --secondary-neon: #f25c54;
+            --text-main: #f5f3f4;
+            --text-muted: #b7b7a4;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        header {
+            width: 100%;
+            text-align: center;
+            padding: 2rem 1rem;
+            background: linear-gradient(180deg, rgba(160, 26, 88, 0.15) 0%, rgba(0,0,0,0) 100%);
+            border-bottom: 2px solid rgba(160, 26, 88, 0.3);
+        }
+
+        .logo-container h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            color: #fff;
+            text-shadow: 0 0 10px var(--primary-neon), 0 0 20px var(--secondary-neon);
+            margin-bottom: 0.5rem;
+        }
+
+        .logo-container p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        main {
+            flex: 1;
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+            gap: 2rem;
+        }
+
+        .arcade-cabinet {
+            background-color: var(--container-bg);
+            width: 100%;
+            max-width: 960px;
+            border: 4px solid #660708;
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(160, 26, 88, 0.4), inset 0 0 20px rgba(0,0,0,0.8);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cabinet-marquee {
+            background-color: #000;
+            padding: 0.75rem;
+            text-align: center;
+            border-bottom: 4px solid #660708;
+            font-weight: bold;
+            color: var(--secondary-neon);
+            letter-spacing: 4px;
+            animation: blink 2s infinite alternate;
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #game-canvas {
+            width: 100%;
+            height: 100%;
+            background-color: #111;
+        }
+
+        .placeholder-ui {
+            position: absolute;
+            text-align: center;
+            padding: 2rem;
+            pointer-events: none;
+        }
+
+        .placeholder-ui h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .play-btn {
+            background: linear-gradient(135deg, var(--primary-neon), var(--secondary-neon));
+            color: #fff;
+            border: none;
+            padding: 1rem 2.5rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 6px;
+            cursor: pointer;
+            pointer-events: auto;
+            box-shadow: 0 4px 15px rgba(242, 92, 84, 0.4);
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+
+        .play-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(242, 92, 84, 0.6);
+        }
+
+        .play-btn:active {
+            transform: translateY(1px);
+        }
+
+        .cabinet-controls {
+            background-color: #000;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 4px solid #660708;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .control-hints {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .control-hints span {
+            color: var(--secondary-neon);
+            font-weight: bold;
+        }
+
+        .action-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .action-btn {
+            background-color: #222;
+            color: #fff;
+            text-decoration: none;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.8rem;
+            font-weight: bold;
+            border-radius: 4px;
+            border: 1px solid #444;
+            transition: background-color 0.2s;
+        }
+
+        .action-btn:hover {
+            background-color: #333;
+            border-color: var(--primary-neon);
+        }
+
+        .game-info-panel {
+            width: 100%;
+            max-width: 960px;
+            background-color: var(--container-bg);
+            border-radius: 8px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .game-info-panel h3 {
+            font-size: 1.4rem;
+            color: var(--secondary-neon);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .game-info-panel p {
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        footer {
+            width: 100%;
+            text-align: center;
+            padding: 2rem;
+            color: #444;
+            font-size: 0.8rem;
+            border-top: 1px solid rgba(255,255,255,0.02);
+            margin-top: auto;
+        }
+
+        @keyframes blink {
+            0% { opacity: 0.8; text-shadow: 0 0 5px var(--secondary-neon); }
+            100% { opacity: 1; text-shadow: 0 0 15px var(--secondary-neon), 0 0 25px var(--primary-neon); }
+        }
+
+        @media (max-width: 768px) {
+            .cabinet-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .action-links {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <h1>Barnaby's Damned Day</h1>
+            <p>R-Rated Retro Web Arcade v1.0.4</p>
+        </div>
+    </header>
+
+    <main>
+        <!-- The Main Interactive Arcade Box -->
+        <div class="arcade-cabinet">
+            <div class="cabinet-marquee">INSERT COIN // PRESS START</div>
+            
+            <div class="canvas-container">
+                <!-- Unity WebGL / Canvas Target -->
+                <canvas id="game-canvas"></canvas>
+                
+                <!-- Overlay Interface before engine hydration -->
+                <div class="placeholder-ui" id="load-overlay">
+                    <h2>Ready to Build a Dam?</h2>
+                    <button class="play-btn" onclick="initializeArcadeEngine()">Boot System</button>
+                </div>
+            </div>
+
+            <div class="cabinet-controls">
+                <div class="control-hints">
+                    ⌨️ <span>WASD / Arrows</span>: Move Barnaby<br>
+                    SPACE: Jump // <span>[B] Key</span>: Context-Sensitive Action
+                </div>
+                <div class="action-links">
+                    <a href="#" class="action-btn" target="_blank">🛒 Steam Wishlist</a>
+                    <a href="#" class="action-btn" target="_blank">📱 Google Play</a>
+                    <a href="#" class="action-btn" target="_blank">💬 Discord</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Meta Context Summary -->
+        <div class="game-info-panel">
+            <h3>System Status Log</h3>
+            <p>You play as Barnaby, a highly cynical, severely hungover beaver armed with a gas-powered chainsaw. After a corrupt logging conglomerate completely liquidates your home to build a luxury executive resort casino, it's up to you to fight your way straight through corporate middle management to balance the quarterly sheets.</p>
+            <p style="color: #660708; font-weight: bold; margin-bottom: 0;">⚠️ CLASSIFICATION RATING: MATURE ADULT COMPLIANCE RULES ENFORCED.</p>
+        </div>
+    </main>
+
+    <footer>
+        &copy; 2026 Barnaby's Damned Day Development Team. Manufactured by Corporate Disruption Tools.
+    </footer>
+
+    <script>
+        function initializeArcadeEngine() {
+            const overlay = document.getElementById('load-overlay');
+            overlay.style.transition = 'opacity 0.5s ease';
+            overlay.style.opacity = '0';
+            
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                // Simulation placeholder notice for game environment injection
+                alert("Arcade Engine Initialized successfully! Hook your Unity WebGL build folders directly into this index.html deployment structure to stream asset binary bundles.");
+            }, 500);
+        }
+    </script>
+</body>
+</html>
